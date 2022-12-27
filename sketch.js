@@ -31,6 +31,7 @@ let ColorSchemeFilterSelected = true;
 let SearchTermSelected = false;
 
 let AIoCImage;
+let QrCode;
 
 let CanvasContext; // To render images from urls on screen
 
@@ -80,6 +81,8 @@ function preload()
   CustomFont = loadFont("assests\\Karrik-Regular.otf");
   //https://lh3.googleusercontent.com/ci/AC_FhM9QeeCRXkEuMuILA7EQgh43ddYVS7USQgnghZ2yXR1_9mqe-8DGt1PtmjbvSy9rnf9hl9LuR58
   AIoCImage = loadImage("assests\\AIoC Logo.png");
+  QrCode = loadImage("assests\\GitHub QR Code.svg");
+
 }
 
 function setup()
@@ -1057,6 +1060,43 @@ function DrawBottomText()
   fill(BottomTextColor);
   noStroke();
   text("Lukas Fortmeier // Image search poster", infoTextX, infoTextY, infoTextWidth, infoTextHeight);
+
+  // QR code to github repo
+  var qrX = width - boxHeight;
+  var qrY = height - boxHeight;
+  var qrWidth = boxHeight;
+  var qrHeight = boxHeight;
+  image(QrCode, qrX, qrY, qrWidth, qrHeight);
+  // Qr info text
+  push();
+  var qrInfoX = qrX - (1.2 * NormalFontSize);
+  var qrInfoY = height;
+  var qrInfoWidth = boxHeight;
+  var qrInfoHeight = qrX - qrInfoX;
+  textAlign(CENTER, CENTER);
+  textFont(CustomFont);
+  textSize(NormalFontSize);
+  fill(BottomTextColor);
+  noStroke();
+  translate(qrInfoX, qrInfoY);
+  rotate(radians(270));
+  text("Get the code", 0, 0, qrInfoWidth, qrInfoHeight);
+  pop();
+  // Hit test QR Code
+  if (mouseX > qrX && mouseX < qrX + qrWidth && mouseY > qrY && mouseY < qrY + qrHeight)
+  {
+    if (MouseDown)
+    {
+      window.open("https://github.com/Baumkuchenmann/ImageSearchPoster");
+    }
+    else
+    {
+      var hoverOverlay = color(red(HoverColor), green(HoverColor), blue(HoverColor), 50);
+      fill(hoverOverlay);
+      noStroke();
+      rect(qrX, qrY, qrWidth, qrHeight);
+    }
+  }
 
   // Export Button
   if (CurrentState == PosterStates.PosterView)
