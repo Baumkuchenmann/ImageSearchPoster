@@ -21,9 +21,9 @@ let ControlColor;
 
  // Text Properties
 let CustomFont;
-let HeaderFontSize = 120;
-let SubHeaderFontSize = 80;
-let NormalFontSize = 40;
+let HeaderFontSize = 38;
+let SubHeaderFontSize = 25;
+let NormalFontSize = 12;
 
 //CheckBox variables
 let AIoCSourceSelected = true;
@@ -34,6 +34,8 @@ let AIoCImage;
 let QrCode;
 
 let CanvasContext; // To render images from urls on screen
+
+let ExportScale = 6.25; // export scale factor. Based on A4 with 96 dpi should result in A2 with 300 dpi
 
 let CurrentState = PosterStates.SourceSelection;
 
@@ -104,10 +106,15 @@ function setup()
     ColorPickers[i].hide();
   }
   SearchTermBox = createInput("");
+  SearchTermBox.style("font-size", NormalFontSize + "px");
   SearchTermBox.hide();
-  UrlTextBox = createInput("Input Url to Image which will be used as Color Scheme");
+  UrlTextBox = createInput("Image Url to load Color Scheme");
+  UrlTextBox.style("font-size", NormalFontSize + "px");
   UrlTextBox.hide();
-  UrlButton = createButton("Load Color Scheme");
+  UrlButton = createButton("Load");
+  UrlButton.style("font-size", NormalFontSize + "px");
+  UrlButton.style("background-color", ButtonColor);
+  UrlButton.style("border", "none");
   UrlButton.mousePressed(() =>
   {
     var Picture = new Image();
@@ -150,7 +157,7 @@ function setup()
   UrlButton.hide();
 
   // Create Canvas
-  CanvasContext = createCanvas(2480, 3508);
+  CanvasContext = createCanvas(794, 1123); // a4 with 96 dpi
   CanvasContext = CanvasContext.canvas.getContext("2d");
 }
 
@@ -539,7 +546,7 @@ function DrawSourceSelection()
 
   // Descriton
   var descriptionx = width/100;
-  var descriptiony = height / 4;
+  var descriptiony = height * 0.8;
   var descriptionWidth = width / 2;
   var descriptionHeight = height - descriptiony;
   textAlign(TOP, LEFT);
@@ -547,7 +554,18 @@ function DrawSourceSelection()
   textFont(CustomFont);
   fill(TextColor);
   noStroke();
-  text("", descriptionx, descriptiony, descriptionWidth, descriptionHeight);
+  text("Gets pictures from the listed picture sources. Filters can be choosen on the next page. Filter by search term and filter by color scheme is available. All picture which passed the filter are arranged into a poster. Press \"s\" on the poster view to save the poster", descriptionx, descriptiony, descriptionWidth, descriptionHeight);
+  // Description Header
+  var descriptionHeaderx = descriptionx;
+  var descpriptionHeaderWidth = descriptionWidth;
+  var descriptionHeaderHeight = SubHeaderFontSize;
+  var descriptionHeadery = descriptiony - SubHeaderFontSize - (height / 50);
+  textAlign(LEFT, CENTER);
+  textSize(SubHeaderFontSize);
+  textFont(CustomFont);
+  fill(TextColor);
+  noStroke();
+  text("Description", descriptionHeaderx, descriptionHeadery, descpriptionHeaderWidth, descriptionHeaderHeight);
 
   // Draw move to filter page button
   var buttonWidth = width / 5;
@@ -767,7 +785,7 @@ function DrawFilterSelection()
   UrlTextBox.position(urlTextX, urlY);
   UrlTextBox.size(urlTextWidth, urlHeight);
   UrlButton.position(urlButtonX, urlY);
-  UrlButton.size(urlButtonWidth, urlHeight);
+  UrlButton.size(urlButtonWidth - 6, urlHeight + 6);
   
   //Draw Search Term Box
   var searchBoxX = width / 1.9;
@@ -1098,13 +1116,24 @@ function DrawBottomText()
     }
   }
 
-  // Export Button
-  if (CurrentState == PosterStates.PosterView)
-  {
-    
-  }
-
   pop();
 }
 
+//#endregion
+
+//#region Export
+function keyPressed()
+{
+  if (CurrentState == PosterStates.PosterView)
+  {
+    if (key == 's' || key == 'S')
+    {
+      pixelDensity(ExportScale);
+      draw();
+      let fileName = "ImageSearch " + year() + "_" + month() +"_" + day() + "_" + hour() + "_" + minute() + "_" + second() + ".png";
+      saveCanvas(fileName);
+      pixelDensity(1);
+    }
+  }
+}
 //#endregion
